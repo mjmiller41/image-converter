@@ -1,7 +1,7 @@
 {
-  "name": "hyde-js",
+  "name": "image-converter",
   "version": "1.0.0",
-  "description": "A Jekyll-like static site generator using Node.js",
+  "description": "An image converting web application",
   "author": "",
   "license": "MIT",
   "type": "commonjs",
@@ -12,12 +12,9 @@
     "clean": "rm -rf .parcel-cache/ && rm -rf _site"
   },
   "keywords": [
-    "static site generator",
-    "hydejs",
-    "liquidjs",
-    "front matter",
-    "blog",
-    "web app"
+    "iimage converter",
+    "web app",
+    "jpg to pdf"
   ],
   "workspaces": [
     "packages/*"
