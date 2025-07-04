@@ -1,0 +1,255 @@
+@use 'variables' as v;
+/**
+ * Reset some basic elements
+ */
+body, h1, h2, h3, h4, h5, h6,
+p, blockquote, pre, hr,
+dl, dd, ol, ul, figure {
+  margin: 0;
+  padding: 0;
+}
+
+
+
+/**
+ * Basic styling
+ */
+body {
+  font: v.$base-font-weight #{v.$base-font-size}/#{v.$base-line-height} v.$base-font-family;
+  color: v.$text-color;
+  background-color: v.$background-color;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-feature-settings: "kern" 1;
+     -moz-font-feature-settings: "kern" 1;
+       -o-font-feature-settings: "kern" 1;
+          font-feature-settings: "kern" 1;
+  font-kerning: normal;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+
+
+/**
+ * Set `margin-bottom` to maintain vertical rhythm
+ */
+h1, h2, h3, h4, h5, h6,
+p, blockquote, pre,
+ul, ol, dl, figure,
+%vertical-rhythm {
+  margin-bottom: v.$spacing-unit * 0.5;
+}
+
+
+
+/**
+ * `main` element
+ */
+main {
+  display: block; /* Default value of `display` of `main` element is 'inline' in IE 11. */
+}
+
+
+
+/**
+ * Images
+ */
+img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+
+
+/**
+ * Figures
+ */
+figure > img {
+  display: block;
+}
+
+figcaption {
+  font-size: v.$small-font-size;
+}
+
+
+
+/**
+ * Lists
+ */
+ul, ol {
+  margin-left: v.$spacing-unit;
+}
+
+li {
+  > ul,
+  > ol {
+    margin-bottom: 0;
+  }
+}
+
+
+
+/**
+ * Headings
+ */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: v.$base-font-weight;
+}
+
+
+
+/**
+ * Links
+ */
+a {
+  color: v.$brand-color;
+  text-decoration: none;
+
+  &:visited {
+    // color: darken(v.$brand-color, 15%);
+  }
+
+  &:hover {
+    color: v.$text-color;
+    text-decoration: underline;
+  }
+
+  .social-media-list &:hover {
+    text-decoration: none;
+
+    .username {
+      text-decoration: underline;
+    }
+  }
+}
+
+
+/**
+ * Blockquotes
+ */
+blockquote {
+  color: v.$grey-color;
+  border-left: 4px solid v.$grey-color-light;
+  padding-left: v.$spacing-unit * 0.5;
+  @include v.relative-font-size(1.125);
+  letter-spacing: -1px;
+  font-style: italic;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+
+
+/**
+ * Code formatting
+ */
+pre,
+code {
+  @include v.relative-font-size(0.9375);
+  border: 1px solid v.$grey-color-light;
+  border-radius: 3px;
+  background-color: #eef;
+}
+
+code {
+  padding: 1px 5px;
+}
+
+pre {
+  padding: 8px 12px;
+  overflow-x: auto;
+
+  > code {
+    border: 0;
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+
+
+/**
+ * Wrapper
+ */
+.wrapper {
+  max-width: -webkit-calc(#{v.$content-width} - (#{v.$spacing-unit} * 2));
+  max-width:         calc(#{v.$content-width} - (#{v.$spacing-unit} * 2));
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: v.$spacing-unit;
+  padding-left: v.$spacing-unit;
+  @extend %clearfix;
+
+  @include v.media-query(v.$on-laptop) {
+    max-width: -webkit-calc(#{v.$content-width} - (#{v.$spacing-unit}));
+    max-width:         calc(#{v.$content-width} - (#{v.$spacing-unit}));
+    padding-right: v.$spacing-unit * 0.5;
+    padding-left: v.$spacing-unit * 0.5;
+  }
+}
+
+
+
+/**
+ * Clearfix
+ */
+%clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+
+/**
+ * Icons
+ */
+
+.svg-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    fill: #{v.$grey-color};
+    padding-right: 5px;
+    vertical-align: text-top;
+}
+
+.social-media-list {
+  li + li {
+    padding-top: 5px;
+  }
+}
+
+
+
+/**
+ * Tables
+ */
+table {
+  margin-bottom: v.$spacing-unit;
+  width: 100%;
+  text-align: v.$table-text-align;
+  // color: lighten(v.$text-color, 18%);
+  border-collapse: collapse;
+  border: 1px solid v.$grey-color-light;
+  tr {
+    &:nth-child(even) {
+      // background-color: lighten(v.$grey-color-light, 6%);
+    }
+  }
+  th, td {
+    padding: (v.$spacing-unit * 0.3333333333) (v.$spacing-unit * 0.5);
+  }
+  th {
+    // background-color: lighten(v.$grey-color-light, 3%);
+    // border: 1px solid darken(v.$grey-color-light, 4%);
+    // border-bottom-color: darken(v.$grey-color-light, 12%);
+  }
+  td {
+    border: 1px solid v.$grey-color-light;
+  }
+}

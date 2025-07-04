@@ -1,0 +1,39 @@
+---
+title: JPG to PDF Converter
+permalink: /jpg-to-pdf/
+---
+{% layout 'page' %}
+
+{% block page %}
+  <main>
+    <div class="container">
+      <div>
+        <h1>JPEG to PDF Converter</h1>
+        <p>Upload JPG file(s) to convert them into a single PDF document.</p>
+      </div>
+      <div class="conversion-modes">
+        <button id="jpgToPdfMode" class="active">JPEG to PDF</button>
+        <button id="pdfToJpgMode">PDF to JPEG</button>
+      </div>
+      <div class="upload-area">
+        <input
+          type="file"
+          id="file-input"
+          multiple
+          accept="image/jpeg">
+        <label for="file-input" id="file-label">
+          <p>Drag & drop files here or click to select files</p>
+        </label>
+      </div>
+      <div id="preview-area"></div>
+      <div class="button-group">
+        <button id="convert-btn">Convert & Download</button>
+        <button id="clear-btn">Clear Selection</button>
+      </div>
+      <div>
+        <p>Your files are processed locally in your browser and are never uploaded to any server.</p>
+      </div>
+    </div>
+    <script src="/assets/scripts/main.js" type="module"></script>
+  </main>
+{% endblock %}

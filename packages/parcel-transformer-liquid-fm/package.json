@@ -1,0 +1,19 @@
+{
+  "name": "parcel-transformer-liquid-fm",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "engines": {
+    "parcel": "2.15"
+  },
+  "devDependencies": {
+    "front-matter": "^4.0.2",
+    "liquidjs": "^10.21.1",
+    "parcel": "^2.15.4",
+    "glob": "^11.0.3",
+    "js-yaml": "^4.1.0"
+  }
+}
