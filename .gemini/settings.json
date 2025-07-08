@@ -1,0 +1,10 @@
+{
+  "contextFileName": "GEMINI.md",
+  "theme": "Atom One",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
+}

@@ -1,171 +1,192 @@
+const { ThrowableError } = require("@parcel/diagnostic");
 const { Transformer } = require("@parcel/plugin");
 const { Liquid } = require("liquidjs");
 const fm = require("front-matter");
-const path = require("path");
-const fs = require("fs");
-const yaml = require("js-yaml");
-const glob = require("glob");
 const LiquidFS = require("./liquidFS");
+const globalData = require("./globalData");
 
+/**
+ * Finds a dependency file (layout or partial) within a set of directories.
+ * @param {string} filename - The name of the dependency file.
+ * @param {string[]} searchDirs - The directories to search for the file.
+ * @param {object} liquidFs - The custom Liquid filesystem.
+ * @param {string} extname - The file extension to append.
+ * @returns {string|null} The full path to the file, or null if not found.
+ */
+function findDependencyPath(filename, searchDirs, liquidFs, extname) {
+  const dirs = Array.isArray(searchDirs) ? searchDirs : [searchDirs];
+  for (const dir of dirs) {
+    const resolvedPath = liquidFs.resolve(dir, filename, extname);
+    if (liquidFs.existsSync(resolvedPath)) {
+      return resolvedPath;
+    }
+  }
+  return null;
+}
+
+/**
+ * Recursively extracts data from layouts and partials referenced in the content.
+ * @param {string} content - The Liquid content to scan for dependencies.
+ * @param {import('@parcel/types').MutableAsset} asset - The Parcel asset.
+ * @param {object} liquidFs - The custom Liquid filesystem.
+ * @param {object} config - The transformer's configuration.
+ * @returns {Promise<object>} An object containing the merged data from all dependencies.
+ */
+async function extractDependencyData(content, asset, liquidFs, config) {
+  const layoutRegex = /{%[-]*\s*layout\s+['"]([^'"]+)['"]/;
+  const partialRegex = /{%[-]*\s*render\s+['"]([^'"]+)['"]/g;
+
+  let allData = {};
+
+  /**
+   * Processes a single dependency file.
+   * @param {string} filepath - The absolute path to the dependency file.
+   * @returns {Promise<object>} The front matter from the file and its nested dependencies.
+   */
+  async function processFile(filepath) {
+    asset.invalidateOnFileChange(filepath);
+    const fileContent = liquidFs.readFileSync(filepath, "utf8");
+    const { attributes, body } = fm(fileContent);
+
+    // Recursively extract data from the body of this dependency.
+    const nestedData = await extractDependencyData(body, asset, liquidFs, config);
+
+    // Merge so that the current file's front matter can override nested data.
+    return { ...nestedData, ...attributes };
+  }
+
+  // Process layout first
+  const layoutMatch = content.match(layoutRegex);
+  if (layoutMatch) {
+    const filename = layoutMatch[1];
+    const filepath = findDependencyPath(
+      filename,
+      config.layouts,
+      liquidFs,
+      config.extname
+    );
+    if (filepath) {
+      const layoutData = await processFile(filepath);
+      allData = { ...allData, ...layoutData };
+    } else {
+      console.warn(`Layout file not found: ${filename}`);
+    }
+  }
+
+  // Process all partials in parallel
+  const partialMatches = [...content.matchAll(partialRegex)];
+  const partialDataPromises = partialMatches.map(async (match) => {
+    const filename = match[1];
+    const filepath = findDependencyPath(
+      filename,
+      config.partials,
+      liquidFs,
+      config.extname
+    );
+    if (filepath) {
+      return processFile(filepath);
+    }
+    console.warn(`Partial file not found: ${filename}`);
+    return {};
+  });
+
+  const partialsDataArray = await Promise.all(partialDataPromises);
+  const mergedPartialsData = partialsDataArray.reduce(
+    (acc, data) => ({ ...acc, ...data }),
+    {}
+  );
+  allData = { ...allData, ...mergedPartialsData };
+  return allData;
+}
+
+/**
+ * A Parcel transformer for Liquid templates with front matter.
+ */
 module.exports = new Transformer({
+  /**
+   * Loads LiquidJS and site-wide configuration. It tracks all global data
+   * files (like `config.yml` and collections) as dependencies.
+   * @param {object} options - The options object.
+   * @param {import('@parcel/types').Config} options.config - The Parcel configuration object.
+   * @returns {Promise<object>} The merged configuration for the transformer.
+   */
   async loadConfig({ config }) {
-    const liquidConfig = await config.getConfig([".liquidrc", ".liquidrc.js"], {
+    // Load liquid-specific config from .liquidrc
+    const liquidConfigResult = await config.getConfig([".liquidrc", ".liquidrc.js"], {
       packageKey: "liquid",
     });
-    if (liquidConfig) {
-      config.invalidateOnFileChange(liquidConfig.filePath);
-      return liquidConfig.contents;
+
+    const liquidConfig = liquidConfigResult ? liquidConfigResult.contents : {};
+    if (liquidConfigResult) {
+      config.invalidateOnFileChange(liquidConfigResult.filePath);
     }
-    return {};
+
+    // Load all site-wide data (from config.yml, collections, etc.)
+    // This is done in loadConfig so Parcel tracks these files as dependencies.
+    const siteData = await globalData(config);
+
+    // Return a merged config object to be used in the transform function.
+    return { ...liquidConfig, siteData };
   },
+
+  /**
+   * Transforms a Liquid asset into an HTML asset.
+   * @param {object} options - The options object.
+   * @param {import('@parcel/types').MutableAsset} options.asset - The asset to be transformed.
+   * @param {object} options.config - The transformer's configuration from loadConfig.
+   * @returns {Promise<Array<import('@parcel/types').MutableAsset>>} The transformed asset.
+   */
   async transform({ asset, config }) {
-    const projectRoot = process.cwd();
-    const extname = config.extname;
-    const lytRegx = /{%[-]*\s*layout\s+['"]([^'"]+)['"]/;
-    const rndrRegx = /{%[-]*\s*render\s+['"]([^'"]+)['"]/g;
-    const layoutDirs = Array.isArray(config.layouts)
-      ? config.layouts
-      : [config.layouts];
-    const partialDirs = Array.isArray(config.partials)
-      ? config.partials
-      : [config.partials];
-    // const fileKey = getKey(asset.filePath);
+    const code = await asset.getCode();
+    const { attributes: pageData, body } = fm(code);
 
-    // const fileKey = getKey(asset.filePath);
+    // 1. Site data is now pre-loaded via loadConfig.
+    const { siteData, ...liquidConfig } = config;
 
-    let content = await asset.getCode();
-    let templates = {};
-    let context = {};
+    // 2. Set up the Liquid engine with a custom filesystem resolver.
+    const liquidFs = LiquidFS(asset, { ...siteData, page: pageData }, liquidConfig);
 
-    // const liquidFS = createParcelLiquidFS(asset, config, globalData);
+    // 3. Recursively find and process dependencies (layouts and partials).
+    const dependencyData = await extractDependencyData(
+      body,
+      asset,
+      liquidFs,
+      liquidConfig
+    );
 
-    // engine.registerTag("render", RenderWithFrontMatter);
+    // 4. Assemble the final context, merging all data sources.
+    // Precedence: page > layout/partials > site
+    const context = { ...siteData, ...dependencyData, page: pageData };
 
-    // Extract global/site data
-    const globalData = await getGlobalData(asset, projectRoot);
-    context.site = globalData;
-
-    // Extract file data
-    const { body, attributes } = fm(content);
-    // content = body;
-    context.page = attributes;
-    // templates[fileKey] = body;
-
-    const liquidFs = LiquidFS(asset, context, config);
-
-    // Extract layout data
-    if (body.match(lytRegx)) await extractLayoutData(body);
-
-    // Extract partial data
-    if (body.match(rndrRegx)) await extractPartialsData(body);
-
+    // 5. Initialize the engine and render the template.
     const engine = new Liquid({
-      ...config,
+      ...liquidConfig,
       globals: context,
       fs: liquidFs,
     });
 
-    let rendered = "";
-    const filename = asset.filePath.split("/").slice(-1)[0];
+    let rendered;
     try {
       rendered = await engine.parseAndRender(body, context);
     } catch (error) {
-      console.log(error);
+      // Throw a diagnostic error for Parcel to display.
+      throw new ThrowableError({
+        error,
+        codeFrames: [
+          {
+            filePath: asset.filePath,
+            code: code,
+            // LiquidJS errors often have line numbers. A more robust implementation
+            // would parse error.message to extract the line and column.
+          },
+        ],
+      });
     }
 
     asset.setCode(rendered);
-    if (asset.type === "liquid") asset.type = "html";
+    if (asset.type === "liquid") {
+      asset.type = "html";
+    }
     return [asset];
-
-    function getKey(filepath) {
-      return filepath.split("/").slice(-2).join("/");
-    }
-
-    async function extractLayoutData(content) {
-      const match = content.match(lytRegx);
-      if (match) {
-        const filename = match[1];
-        let filepath = "";
-        for (const dir of layoutDirs) {
-          filepath = liquidFs.resolve(dir, filename, extname);
-          if (liquidFs.existsSync(filepath)) break;
-        }
-        if (filepath) {
-          asset.invalidateOnFileChange(filepath);
-          const fileData = liquidFs.readFileSync(filepath, "utf8");
-          const { attributes, body } = fm(fileData);
-          context.layout = { ...context.layout, ...attributes };
-          templates[getKey(filepath)] = body;
-          await extractPartialsData(body);
-          if (body.match(lytRegx)) extractLayoutData(body);
-        } else {
-          throw new Error(`Layout file not found: ${filename}`);
-        }
-      }
-    }
-
-    async function extractPartialsData(content) {
-      const matches = await content.matchAll(rndrRegx);
-      for (let match of matches) {
-        const filename = match[1];
-        let filepath = "";
-        for (const dir of partialDirs) {
-          filepath = liquidFs.resolve(dir, filename, extname);
-          if (liquidFs.existsSync(filepath)) break;
-        }
-        if (liquidFs.existsSync(filepath)) {
-          asset.invalidateOnFileChange(filepath);
-          const partialContent = liquidFs.readFileSync(filepath, "utf8");
-          const { attributes, body } = fm(partialContent);
-          context = { ...context, ...attributes };
-          templates[getKey(filepath)] = body;
-          if (body.match(rndrRegx)) await extractPartialsData(body);
-        }
-      }
-    }
-
-    async function getGlobalData(asset, projectRoot) {
-      const globalData = {};
-
-      // Extract site data
-      const configPath = path.join(projectRoot, "_config.yml");
-      if (fs.existsSync(configPath)) {
-        asset.invalidateOnFileChange(configPath);
-        const configContent = fs.readFileSync(configPath, "utf8");
-        globalData.site = yaml.load(configContent);
-      }
-
-      // Extract collections data
-      if (globalData.site?.collections) {
-        for (const [collectionName, collectionConfig] of Object.entries(
-          globalData.site.collections
-        )) {
-          const collectionPath = path.join(projectRoot, `_${collectionName}`);
-          if (!fs.existsSync(collectionPath)) continue;
-
-          const files = glob.sync(`${collectionPath}/**/*.*`);
-          files.forEach((file) => asset.invalidateOnFileChange(file));
-
-          globalData.site[collectionName] = files.map((filePath) => {
-            const content = fs.readFileSync(filePath, "utf8");
-            const { attributes, body } = fm(content);
-            let url = attributes.permalink || "";
-            if (
-              collectionConfig.output &&
-              collectionConfig.permalink &&
-              !attributes.permalink
-            ) {
-              url = collectionConfig.permalink.replace(
-                /:title/g,
-                path.basename(filePath, path.extname(filePath))
-              );
-            }
-            return { ...attributes, content: body, url };
-          });
-        }
-      }
-
-      return globalData;
-    }
   },
 });

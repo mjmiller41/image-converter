@@ -4,38 +4,36 @@ title: Home
 {% layout 'home' %}
 
 {% block home %}
-  <article>
-    <div class="container">
-      <header>
-        <h1>JPEG to PDF Converter</h1>
-        <a href="/jpg-to-pdf/">jpg to pdf</a>
-        <p>Upload JPG file(s) to convert them into a single PDF document.</p>
-      </header>
-      <main>
-        <div class="conversion-modes">
-          <button id="jpgToPdfMode" class="active">JPEG to PDF</button>
-          <button id="pdfToJpgMode">PDF to JPEG</button>
-        </div>
-        <div class="upload-area">
-          <input
-            type="file"
-            id="file-input"
-            multiple
-            accept="image/jpeg">
-          <label for="file-input" id="file-label">
-            <p>Drag & drop files here or click to select files</p>
-          </label>
-        </div>
-        <div id="preview-area"></div>
-        <div class="button-group">
-          <button id="convert-btn">Convert & Download</button>
-          <button id="clear-btn">Clear Selection</button>
-        </div>
-      </main>
-      <footer>
-        <p>Your files are processed locally in your browser and are never uploaded to any server.</p>
-      </footer>
+  <div class="container">
+    <div class="conversion-modes">
+      <a href="{{ '/jpg-to-pdf/' }}" class="converter-link">
+        <button>JPG to PDF</button>
+      </a>
+      <a href="{{ '/about.html' }}" class="converter-link">
+        <button>About</button>
+      </a>
     </div>
-    <script src="./assets/scripts/main.js" type="module"></script>
-  </article>
+
+    <section class="converters-grid">
+      <h2>Available Converters</h2>
+      <div class="grid-container">
+        <a href="{{ '/jpg-to-pdf/' }}" class="grid-item">
+          <h3>JPG to PDF</h3>
+          <p>Convert JPG images to a single PDF file.</p>
+        </a>
+        <div class="grid-item placeholder">
+          <h3>PNG to JPG</h3>
+          <p>Coming Soon</p>
+        </div>
+        <div class="grid-item placeholder">
+          <h3>WEBP to PNG</h3>
+          <p>Coming Soon</p>
+        </div>
+        <div class="grid-item placeholder">
+          <h3>Image Resizer</h3>
+          <p>Coming Soon</p>
+        </div>
+      </div>
+    </section>
+  </div>
 {% endblock %}

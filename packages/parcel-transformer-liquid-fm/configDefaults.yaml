@@ -1,10 +1,11 @@
 source: .
 destination: ./_site
 collections_dir: .
-plugins_dir: _plugins # takes an array of strings and loads plugins in that order
-layouts_dir: _layouts
-data_dir: _data
-partials_dir: _partials
+plugins_dir: plugins # takes an array of strings and loads plugins in that order
+layouts_dir: layouts
+data_dir: data
+partials_dir: partials
+config: config.yml
 collections:
   posts:
     output: true
@@ -33,6 +34,7 @@ markdown: kramdown
 highlighter: rouge
 lsi: false
 excerpt_separator: "\n\n"
+excerpt_length: 200
 incremental: false
 
 # Serving

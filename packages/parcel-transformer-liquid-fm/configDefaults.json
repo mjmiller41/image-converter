@@ -1,0 +1,74 @@
+{
+  "baseurl": "",
+  "collections": {
+    "posts": {
+      "output": true
+    }
+  },
+  "collections_dir": ".",
+  "configFile": "config.json",
+  "data_dir": "data",
+  "defaults": [],
+  "destination": "_site/",
+  "detach": false,
+  "encoding": "utf-8",
+  "excerpt_length": 200,
+  "excerpt_separator": "\n\n", // Indicates position in page/post content to end excerpt
+  "exclude": [
+    ".*",
+    "{*.,*}config.{js,json}",
+    "package*.json",
+    "{README*,README}.*",
+    "{LICENSE*,LICENSE}.*",
+    ".sass-cache/**/*.*",
+    ".parcel-cache/**/*.*",
+    "node_modules/**/*.*",
+    "packages/**/*.*",
+    "layouts/**/*.*",
+    "partials/**/*.*",
+    "dist/**/*.*",
+    "sass/**/*.*"
+  ],
+  "future": false,
+  "highlighter": "rouge",
+  "host": "127.0.0.1",
+  "include": [".htaccess"],
+  "incremental": false,
+  "keep_files": [".git", ".svn"],
+  "kramdown": {
+    "auto_ids": true,
+    "entity_output": "as_char",
+    "footnote_nr": 1,
+    "hard_wrap": false,
+    "input": "GFM",
+    "show_warnings": false,
+    "smart_quotes": "lsquo,rsquo,ldquo,rdquo",
+    "toc_levels": [1, 2, 3, 4, 5, 6]
+  },
+  "layouts_dir": "layouts",
+  "limit_posts": 0,
+  "liquid": {
+    "error_mode": "warn",
+    "strict_filters": false,
+    "strict_variables": false
+  },
+  "lsi": false,
+  "markdown": "kramdown",
+  "markdown_ext": "markdown,mkdown,mkdn,mkd,md",
+  "paginate_path": "/page:num",
+  "partials_dir": "partials",
+  "permalink": "date",
+  "plugins": [],
+  "plugins_dir": "plugins",
+  "port": 4000,
+  "quiet": false,
+  "safe": false,
+  "show_dir_listing": false,
+  "show_drafts": null,
+  "source": "src/**/*.*",
+  "strict_front_matter": false,
+  "timezone": null,
+  "unpublished": false,
+  "verbose": false,
+  "whitelist": []
+}

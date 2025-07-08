@@ -1,0 +1,9 @@
+{
+  "root": ["/"],
+  "extname": ".liquid",
+  "layouts":"layouts",
+  "partials":"partials",
+  "strictFilters": true,
+  "dynamicPartials": true,
+  "relativeReference": false
+}

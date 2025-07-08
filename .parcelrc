@@ -1,0 +1,21 @@
+{
+  "extends": "@parcel/config-default",
+  "transformers": {
+    "src/**/*.txt": [
+      "@parcel/transformer-raw"
+    ],
+    "**/*.md": [
+      "parcel-transformer-markdown",
+      "..."
+    ],
+    "!(layouts/**|_partials/**)/**/*.{liquid,html}": [
+      "parcel-transformer-liquid-fm"
+    ],
+    "*.{liquid,html}": [
+      "parcel-transformer-liquid-fm"
+    ],
+    "src/assets/styles/!()*/.{css,sass}": [
+      "@parcel/transformer-sass"
+    ]
+  }
+}

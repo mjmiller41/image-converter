@@ -9,11 +9,13 @@
   "engines": {
     "parcel": "2.15"
   },
-  "devDependencies": {
+  "dependencies": {
     "front-matter": "^4.0.2",
-    "liquidjs": "^10.21.1",
-    "parcel": "^2.15.4",
     "glob": "^11.0.3",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "liquidjs": "^10.21.1"
+  },
+  "devDependencies": {
+    "parcel": "^2.15.4"
   }
 }

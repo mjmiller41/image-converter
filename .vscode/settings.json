@@ -1,0 +1,11 @@
+{
+  "geminicodeassist.languages": [
+    "javascript",
+    "css",
+    "html",
+    "sass",
+    "markdown",
+    "json",
+    "yaml"
+  ]
+}

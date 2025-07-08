@@ -1,125 +1,139 @@
 /* Import partials. */
-@import "../../../_sass/main.scss";
-
-body {
-    font-family: sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
-.container {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-h1 {
-    color: #1877f2;
-    margin-bottom: 10px;
-}
+@import "../../../sass/main.scss";
 
 .conversion-modes {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .conversion-modes button {
-    background-color: #e4e6eb;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 20px;
-    margin: 0 10px;
-    font-weight: bold;
-    color: #606770;
+  background-color: #e4e6eb;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 20px;
+  margin: 0 10px;
+  font-weight: bold;
+  color: #606770;
 }
 
 .conversion-modes button.active {
-    background-color: #1877f2;
-    color: #fff;
+  background-color: #1877f2;
+  color: #fff;
 }
 
 .upload-area {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 #file-label {
-    display: block;
-    border: 2px dashed #ccd0d5;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 8px;
+  display: block;
+  border: 2px dashed #ccd0d5;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
 }
 
 #file-label.dragging {
-    border-color: #1877f2;
-    background-color: #f0f2f5;
+  border-color: #1877f2;
+  background-color: #f0f2f5;
 }
 
 #file-input {
-    display: none;
+  display: none;
 }
 
 #preview-area {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .preview-item {
-    position: relative;
+  position: relative;
 }
 
 .preview-item img {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
 }
 
 .button-group {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
 }
 
 #convert-btn {
-    background-color: #42b72a;
-    color: #fff;
+  background-color: #42b72a;
+  color: #fff;
 }
 
 #clear-btn {
-    background-color: #f0f2f5;
-    color: #606770;
+  background-color: #f0f2f5;
+  color: #606770;
 }
 
 footer {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 12px;
-    color: #606770;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
+  color: #606770;
+}
+
+.converters-grid {
+  margin-top: 40px;
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+.grid-item {
+  background-color: #f0f2f5;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.2s;
+}
+.grid-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+.grid-item h3 {
+  margin-top: 0;
+  color: #1877f2;
+}
+.grid-item.placeholder h3 {
+  color: #606770;
+}
+.grid-item.placeholder p {
+  font-style: italic;
+  color: #606770;
+}
+.converter-link button {
+  background-color: #e4e6eb;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 20px;
+  margin: 0 10px;
+  font-weight: bold;
+  color: #606770;
+}
+.converter-link button:hover {
+  background-color: #dcdfe4;
 }
